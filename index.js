@@ -59,6 +59,46 @@ async function run() {
             res.send(result);
         });
 
+        // update car
+        app.put("/cars/:id", async (req, res) => {
+            const id = req.params.id;
+
+            const updatedCar = req.body;
+
+            const query = {
+                _id: new ObjectId(id),
+            };
+
+            const updatedDoc = {
+                $set: {
+                    carName: updatedCar.carName,
+                    description: updatedCar.description,
+                    category: updatedCar.category,
+                    price: updatedCar.price,
+                    location: updatedCar.location,
+                    image: updatedCar.image,
+                    status: updatedCar.status,
+                },
+            };
+
+            const result = await carsCollection.updateOne(query, updatedDoc);
+
+            res.send(result);
+        });
+
+        // delete car
+        app.delete("/cars/:id", async (req, res) => {
+            const id = req.params.id;
+
+            const query = {
+                _id: new ObjectId(id),
+            };
+
+            const result = await carsCollection.deleteOne(query);
+
+            res.send(result);
+        });
+
         // BOOKING APIs
 
         // create booking
@@ -79,6 +119,20 @@ async function run() {
             };
 
             const result = await bookingsCollection.find(query).toArray();
+
+            res.send(result);
+        });
+
+        // my bookings by email => This fetches only logged-in user's cars.
+
+        app.get("/my-cars", async (req, res) => {
+            const email = req.query.email;
+
+            const query = {
+                providerEmail: email,
+            };
+
+            const result = await carsCollection.find(query).toArray();
 
             res.send(result);
         });
